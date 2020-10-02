@@ -108,12 +108,4 @@ static void RaiseMustOverrideException(NSString *method)
     [[self javaBase] setParent:accessibilityParent];
 }
 
-- (jobject)accessibleContext {
-    JNIEnv *env = [ThreadUtilities getJNIEnv];
-    jclass class = (*env)->GetObjectClass(env, [[self javaBase] accessible]);
-        return JNFCallObjectMethod(env, [[self javaBase] accessible], jm_getAccessibleContext);
-}
-
-
-
 @end

@@ -9,5 +9,7 @@
 
 @property(readonly) int accessibleRowCount;
 @property(readonly) int accessibleColCount;
+@property(readonly) NSArray<NSNumber *> *selectedAccessibleRows;
+@property(readonly) NSArray<NSNumber *> *selectedAccessibleColumns;
 
 @end

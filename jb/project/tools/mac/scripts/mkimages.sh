@@ -41,18 +41,17 @@ function create_jbr {
   JBR_BUNDLE=jbr_${bundle_type}
 
   case "${bundle_type}" in
-  "jfx" | "jcef" | "dcevm" | "nomod")
+  "jfx" | "jcef" | "dcevm" | "nomod" | "fd")
     JBR_BASE_NAME=jbr_${bundle_type}-${JBSDK_VERSION}
-    cat modules.list > modules_tmp.list
     ;;
   "jfx_jcef")
     JBR_BASE_NAME=jbr-${JBSDK_VERSION}
-    cat modules.list > modules_tmp.list
     ;;
   *)
-    echo "***ERR*** bundle was not specified" && exit 1
+    echo "***ERR*** bundle was not specified" && do_exit 1
     ;;
   esac
+  cat modules.list > modules_tmp.list
   rm -rf ${BASE_DIR}/${JBR_BUNDLE}
 
   JRE_CONTENTS=${BASE_DIR}/${JBR_BUNDLE}/Contents
@@ -103,8 +102,10 @@ case "$bundle_type" in
     do_reset_changes=1
     ;;
   "dcevm")
-    git apply -p0 < jb/project/tools/patches/add_jcef_module.patch || do_exit $?
+    HEAD_REVISION=$(git rev-parse HEAD)
     git am jb/project/tools/patches/dcevm/*.patch || do_exit $?
+    do_reset_dcevm=1
+    git apply -p0 < jb/project/tools/patches/add_jcef_module.patch || do_exit $?
     do_reset_changes=1
     ;;
   "nomod")

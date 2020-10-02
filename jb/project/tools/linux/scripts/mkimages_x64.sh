@@ -127,7 +127,7 @@ sh configure \
 make clean CONF=$RELEASE_NAME || do_exit $?
 make images CONF=$RELEASE_NAME || do_exit $?
 
-JSDK=build/${RELEASE_NAME}/images/jdk-bundle
+JSDK=build/${RELEASE_NAME}/images/jdk
 
 echo Fixing permissions
 chmod -R a+r $JSDK

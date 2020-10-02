@@ -71,7 +71,7 @@ function create_jbr {
   cp -R ${BASE_DIR}/${JBRSDK_BUNDLE}/Contents/MacOS ${JRE_CONTENTS}
   cp ${BASE_DIR}/${JBRSDK_BUNDLE}/Contents/Info.plist ${JRE_CONTENTS}
 
-  if [[ "${bundle_type}" == *jcef* ]] || [[ "${bundle_type}" == *dcevm* ]]; then
+  if [[ "${bundle_type}" == *jcef* ]] || [[ "${bundle_type}" == *dcevm* ]] || [[ "${bundle_type}" == fd ]]; then
     rm -rf ${JRE_CONTENTS}/Frameworks || do_exit $?
     cp -a ${JCEF_PATH}/Frameworks ${JRE_CONTENTS} || do_exit $?
   fi
@@ -133,10 +133,10 @@ sh configure \
   --with-boot-jdk=`/usr/libexec/java_home -v 11` \
   --enable-cds=yes || do_exit $?
 
-#make clean CONF=$RELEASE_NAME || do_exit $?
+make clean CONF=$RELEASE_NAME || do_exit $?
 make images CONF=$RELEASE_NAME || do_exit $?
 
-JSDK=build/$RELEASE_NAME/images/jdk-bundle
+JSDK=build/${RELEASE_NAME}/images/jdk-bundle
 
 BASE_DIR=jre
 JBRSDK_BUNDLE=jbrsdk
@@ -145,18 +145,18 @@ rm -rf $BASE_DIR
 mkdir $BASE_DIR || do_exit $?
 cp -a $JSDK/jdk-$JBSDK_VERSION_WITH_DOTS.jdk $BASE_DIR/$JBRSDK_BUNDLE || do_exit $?
 
-if [ "$bundle_type" == *jcef* ] || [ "$bundle_type" == *dcevm* ] || [ "$bundle_type" == "fd" ]; then
+  if [[ "${bundle_type}" == *jcef* ]] || [[ "${bundle_type}" == *dcevm* ]] || [[ "${bundle_type}" == fd ]]; then
   cp -a ${JCEF_PATH}/Frameworks $BASE_DIR/$JBRSDK_BUNDLE/Contents/
 fi
-if [ "$bundle_type" == "jcef" ] || [ "$bundle_type" == "fd" ]; then
+if [ "${bundle_type}" == "jcef" ] || [ "{$bundle_type}" == "fd" ]; then
   echo Creating $JBSDK.tar.gz ...
   sed 's/JBR/JBRSDK/g' ${BASE_DIR}/${JBRSDK_BUNDLE}/Contents/Home/release > release
   mv release ${BASE_DIR}/${JBRSDK_BUNDLE}/Contents/Home/release
-  [ -f "$JBSDK.tar.gz" ] && rm "$JBSDK.tar.gz"
-  COPYFILE_DISABLE=1 tar -pczf $JBSDK.tar.gz -C $BASE_DIR \
+  [ -f "${JBSDK}.tar.gz" ] && rm "${JBSDK}.tar.gz"
+  COPYFILE_DISABLE=1 tar -pczf ${JBSDK}.tar.gz -C ${BASE_DIR} \
     --exclude='._*' --exclude='.DS_Store' --exclude='*~' \
     --exclude='Home/demo' --exclude='Home/man' --exclude='Home/sample' \
-    $JBRSDK_BUNDLE || do_exit $?
+    ${JBRSDK_BUNDLE} || do_exit $?
 fi
 
 create_jbr || do_exit $?
@@ -167,8 +167,8 @@ if [ "$bundle_type" == "jcef" ]; then
   JBRSDK_TEST=$JBRSDK_BASE_NAME-osx-test-x64-b$build_number
 
   echo Creating $JBRSDK_TEST.tar.gz ...
-  [ -f "$JBRSDK_TEST.tar.gz" ] && rm "$JBRSDK_TEST.tar.gz"
-  COPYFILE_DISABLE=1 tar -pczf $JBRSDK_TEST.tar.gz -C build/${RELEASE_NAME}/images \
+  [ -f "${JBRSDK_TEST}.tar.gz" ] && rm "${JBRSDK_TEST}.tar.gz"
+  COPYFILE_DISABLE=1 tar -pczf ${JBRSDK_TEST}.tar.gz -C build/${RELEASE_NAME}/images \
     --exclude='test/jdk/demos' test || do_exit $?
 fi
 

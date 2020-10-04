@@ -104,6 +104,9 @@ case "$bundle_type" in
     JBRSDK_BASE_NAME=jbrsdk-${JBSDK_VERSION}-fastdebug
     JBSDK=${JBRSDK_BASE_NAME}-windows-x64-fastdebug-b${build_number}
     ;;
+  *)
+    echo "***ERR*** bundle was not specified" && do_exit 1
+    ;;
 esac
 
 sh ./configure \

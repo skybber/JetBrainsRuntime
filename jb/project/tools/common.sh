@@ -10,7 +10,7 @@ function do_exit() {
   exit_code=$1
   [ $do_reset_changes -eq 1 ] && git checkout HEAD modules.list src/java.desktop/share/classes/module-info.java
   if [ $do_reset_dcevm -eq 1 ]; then
-    [ $HEAD_REVISION -ne 0 ] && git reset --hard $HEAD_REVISION
+    [ ! -z $HEAD_REVISION ] && git reset --hard $HEAD_REVISION
   fi
   exit $exit_code
 }

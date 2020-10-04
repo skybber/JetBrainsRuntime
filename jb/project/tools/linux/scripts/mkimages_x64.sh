@@ -71,7 +71,7 @@ function create_jbr {
   rm -rf ${BASE_DIR}/jbr
   cp -R ${BASE_DIR}/${JBR_BUNDLE} ${BASE_DIR}/jbr
   tar -pcf ${JBR}.tar -C ${BASE_DIR} jbr || do_exit $?
-  gzip ${JBR}.tar || do_exit $?
+  gzip -f ${JBR}.tar || do_exit $?
   rm -rf ${BASE_DIR}/${JBR_BUNDLE}
 }
 
@@ -109,7 +109,10 @@ case "$bundle_type" in
     WITH_DEBUG_LEVEL="--with-debug-level=fastdebug"
     RELEASE_NAME=linux-x86_64-normal-server-fastdebug
     JBRSDK_BASE_NAME=jbrsdk-${JBSDK_VERSION}-fastdebug
-    JBSDK=${JBRSDK_BASE_NAME}-linux-x64-fastdebug-b${build_number}
+    JBSDK=${JBRSDK_BASE_NAME}-linux-x64-b${build_number}
+    ;;
+  *)
+    echo "***ERR*** bundle was not specified" && do_exit 1
     ;;
 esac
 
@@ -124,8 +127,7 @@ sh configure \
   $WITH_IMPORT_MODULES \
   --enable-cds=yes || do_exit $?
 
-make clean CONF=$RELEASE_NAME || do_exit $?
-make images CONF=$RELEASE_NAME || do_exit $?
+make clean images CONF=$RELEASE_NAME || do_exit $?
 
 JSDK=build/${RELEASE_NAME}/images/jdk
 
@@ -141,14 +143,14 @@ cp -r $JSDK $BASE_DIR/$JBRSDK_BUNDLE || do_exit $?
 if [[ "${bundle_type}" == *jcef* ]] || [[ "${bundle_type}" == *dcevm* ]] || [[ "${bundle_type}" == fd ]]; then
   cp -R ${JCEF_PATH}/* $BASE_DIR/$JBRSDK_BUNDLE/lib || do_exit $?
 fi
-if [ "${bundle_type}" == "jcef" ] || [ "{$bundle_type}" == "fd" ]; then
+if [ "${bundle_type}" == "jcef" ] || [ "${bundle_type}" == "fd" ]; then
   echo Creating $JBSDK.tar.gz ...
   sed 's/JBR/JBRSDK/g' ${BASE_DIR}/${JBRSDK_BUNDLE}/release > release
   mv release ${BASE_DIR}/${JBRSDK_BUNDLE}/release
 
   tar -pcf ${JBSDK}.tar --exclude=*.debuginfo --exclude=demo --exclude=sample --exclude=man \
     -C ${BASE_DIR} ${JBRSDK_BUNDLE} || do_exit $?
-  gzip ${JBSDK}.tar || do_exit $?
+  gzip -f ${JBSDK}.tar || do_exit $?
 fi
 
 create_jbr || do_exit $?
@@ -159,9 +161,8 @@ if [ "$bundle_type" == "jcef" ]; then
   JBRSDK_TEST=$JBRSDK_BASE_NAME-linux-test-x64-b$build_number
 
   echo Creating $JBSDK_TEST.tar.gz ...
-  [ -f "${JBRSDK_TEST}.tar.gz" ] && rm "${JBRSDK_TEST}.tar.gz"
   tar -pcf ${JBRSDK_TEST}.tar -C ${BASE_DIR} --exclude='test/jdk/demos' test || do_exit $?
-  gzip ${JBRSDK_TEST}.tar || do_exit $?
+  gzip -f ${JBRSDK_TEST}.tar || do_exit $?
 fi
 
 do_exit 0

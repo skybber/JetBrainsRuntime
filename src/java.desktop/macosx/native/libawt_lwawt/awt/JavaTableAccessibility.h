@@ -11,5 +11,7 @@
 @property(readonly) int accessibleColCount;
 @property(readonly) NSArray<NSNumber *> *selectedAccessibleRows;
 @property(readonly) NSArray<NSNumber *> *selectedAccessibleColumns;
+- (int) accessibleRowAtIndex:(int)index;
+- (int) accessibleColumnAtIndex:(int)index;
 
 @end

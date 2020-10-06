@@ -502,6 +502,22 @@ static jobject sAccessibilityClass = NULL;
     fParent = javaBaseAccessibilityParent;
 }
 
+- (NSString *)nsRole {
+    return fNSRole;
+}
+
+- (NSUInteger)accessibilityIndexOfChild:(id)child {
+
+    if ([child isKindOfClass:[PlatformAxElement class]]) {
+        child = [child javaBase];
+    }
+    jint returnValue = JNFCallStaticIntMethod( [ThreadUtilities getJNIEnv],
+                                sjm_getAccessibleIndexInParent,
+                                [child accessible],
+                                [child component]);
+    return (returnValue == -1) ? NSNotFound : returnValue;
+}
+
 @end
 
 /*

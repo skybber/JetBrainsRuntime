@@ -24,6 +24,10 @@ static const char* ACCESSIBLE_JTABLE_NAME = "javax.swing.JTable$AccessibleJTable
 @implementation PlatformAxTable
 
 - (NSArray *)accessibilityRows {
+    NSArray *child = [self accessibilityChildren];
+    for (JavaElementAccessibility *cell in child) {
+        printf("Координаты %d ячейки %d : %d\n", [[self javaBase] accessibilityIndexOfChild:cell], [self accessibleRowAtIndex:[[self javaBase] accessibilityIndexOfChild:cell]], [self accessibleColumnAtIndex:[[self javaBase] accessibilityIndexOfChild:cell]]);
+    }
     return [self accessibilityChildren];
 }
 /*
@@ -84,7 +88,7 @@ static const char* ACCESSIBLE_JTABLE_NAME = "javax.swing.JTable$AccessibleJTable
     JNFClassInfo clsInfo;
     clsInfo.name = ACCESSIBLE_JTABLE_NAME;
     clsInfo.cls = (*env)->GetObjectClass(env, [[self javaBase] axContextWithEnv:env]);
-    JNF_MEMBER_CACHE(jm_getSelectedAccessibleRows, clsInfo, "getSelectedAccessibleRows", "()I [");
+    JNF_MEMBER_CACHE(jm_getSelectedAccessibleRows, clsInfo, "getSelectedAccessibleRows", "()[I");
     jintArray selectidRowNumbers = JNFCallIntMethod(env, [[self javaBase] axContextWithEnv:env], jm_getSelectedAccessibleRows);
     if (selectidRowNumbers == NULL) {
         return nil;
@@ -102,7 +106,7 @@ static const char* ACCESSIBLE_JTABLE_NAME = "javax.swing.JTable$AccessibleJTable
     JNFClassInfo clsInfo;
     clsInfo.name = ACCESSIBLE_JTABLE_NAME;
     clsInfo.cls = (*env)->GetObjectClass(env, [[self javaBase] axContextWithEnv:env]);
-    JNF_MEMBER_CACHE(jm_getSelectedAccessibleColumns, clsInfo, "getSelectedAccessibleColumns", "()I [");
+    JNF_MEMBER_CACHE(jm_getSelectedAccessibleColumns, clsInfo, "getSelectedAccessibleColumns", "()[I");
     jintArray selectidColumnNumbers = JNFCallIntMethod(env, [[self javaBase] axContextWithEnv:env], jm_getSelectedAccessibleColumns);
     if (selectidColumnNumbers == NULL) {
         return nil;
@@ -113,6 +117,26 @@ static const char* ACCESSIBLE_JTABLE_NAME = "javax.swing.JTable$AccessibleJTable
         [nsArraySelectidColumnNumbers addObject:[NSNumber numberWithInt:(*env)->GetObjectArrayElement(env, selectidColumnNumbers, i)]];
     }
     return [NSArray<NSNumber *> arrayWithArray:nsArraySelectidColumnNumbers];
+}
+
+- (int)accessibleRowAtIndex:(int)index { 
+    JNIEnv *env = [ThreadUtilities getJNIEnv];
+    JNFClassInfo clsInfo;
+    clsInfo.name = ACCESSIBLE_JTABLE_NAME;
+    clsInfo.cls = (*env)->GetObjectClass(env, [[self javaBase] axContextWithEnv:env]);
+    JNF_MEMBER_CACHE(jm_getAccessibleRowAtIndex, clsInfo, "getAccessibleRowAtIndex", "(I)I");
+    jint rowAtIndex = JNFCallIntMethod(env, [[self javaBase] axContextWithEnv:env], jm_getAccessibleRowAtIndex, (jint)index);
+    return (int)rowAtIndex;
+}
+
+- (int)accessibleColumnAtIndex:(int)index { 
+    JNIEnv *env = [ThreadUtilities getJNIEnv];
+    JNFClassInfo clsInfo;
+    clsInfo.name = ACCESSIBLE_JTABLE_NAME;
+    clsInfo.cls = (*env)->GetObjectClass(env, [[self javaBase] axContextWithEnv:env]);
+    JNF_MEMBER_CACHE(jm_getAccessibleColumnAtIndex, clsInfo, "getAccessibleColumnAtIndex", "(I)I");
+    jint columnAtIndex = JNFCallIntMethod(env, [[self javaBase] axContextWithEnv:env], jm_getAccessibleColumnAtIndex, (jint)index);
+    return (int)columnAtIndex;
 }
 
 @end

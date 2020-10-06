@@ -108,4 +108,8 @@ static void RaiseMustOverrideException(NSString *method)
     [[self javaBase] setParent:accessibilityParent];
 }
 
+- (NSUInteger)accessibilityIndexOfChild:(id)child {
+    return [[self javaBase] accessibilityIndexOfChild:child];
+}
+
 @end
